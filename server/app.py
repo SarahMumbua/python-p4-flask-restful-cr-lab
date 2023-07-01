@@ -16,12 +16,39 @@ db.init_app(app)
 
 api = Api(app)
 
+
 class Plants(Resource):
-    pass
+    def get(self):
+        plants = Plant.query.all()
+        data = []
+        for plant in plants:
+            data.append({
+                'id': plant.id,
+                'name': plant.name,
+                'image': plant.image,
+                'price': plant.price
+            })
+        return jsonify(data)
+
 
 class PlantByID(Resource):
-    pass
-        
+    def get(self, id):
+        plant = Plant.query.get(id)
+        if plant is None:
+            return make_response(jsonify({'error': 'Plant not found'}), 404)
+
+        data = {
+            'id': plant.id,
+            'name': plant.name,
+            'image': plant.image,
+            'price': plant.price
+        }
+        return jsonify(data)
+
+
+api.add_resource(Plants, '/plants')
+api.add_resource(PlantByID, '/plants/<int:id>')
+
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
